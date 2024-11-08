@@ -1,0 +1,7 @@
+DATABASE_TYPE: "postgresql"
+DBAPI: "psycopg2"
+USER: "postgres"
+PASSWORD: "postgres"
+HOST: "localhost"
+PORT: 5432
+DATABASE: "sales_data"
