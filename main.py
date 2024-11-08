@@ -1,6 +1,7 @@
 from database_utils import DatabaseConnector
 from data_extraction import DataExtractor
 from data_cleaning import DataCleaning
+import pandas as pd
 
 if __name__ == "__main__":
     # Initialize the DatabaseConnector and create the source engine (for RDS)
@@ -20,12 +21,15 @@ if __name__ == "__main__":
     print("Tables in the source database:", tables)
 
     # Extract data from a specific table ('legacy_users')
-    data = data_extractor.read_rds_table('legacy_users')  # Get data from the 'legacy_users' table
-    #print(data)  
+    data = data_extractor.read_rds_table('legacy_users')  
+    data = pd.DataFrame(data) 
+    print(type(data)) 
+    
 
     # Initialize the DataCleaning class and clean the extracted data (for CSV data)
-    csv_cleaning = DataCleaning(data=data)  
+    csv_cleaning = DataCleaning(data)  
     cleaned_csv = csv_cleaning.clean_user_data()
+    print(cleaned_csv)
     csv_cleaning.cleaned_csv('cleaned_file.csv')
 
     # Upload the cleaned data to the local database in the 'dim_users' table
@@ -35,15 +39,14 @@ if __name__ == "__main__":
     # Retrieve the PDF data using Tabula 
     pdf_link = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
     pdf_data = data_extractor.retrieve_pdf_data(pdf_link)
-    print(pdf_data)
+    print(type(pdf_data))
     
-    if pdf_data is not None:
-        # Clean PDF data
-        pdf_cleaning = DataCleaning(pdf_data=pdf_data)  # Provide the PDF data here
-        cleaned_pdf = pdf_cleaning.clean_card_data()
+    pdf_data_df = pd.DataFrame([pdf_data])
+    print(type(pdf_data_df))
+        
+    # Clean PDF data
+    pdf_cleaning = DataCleaning(data=pdf_data_df)  
+    cleaned_pdf = pdf_cleaning.clean_card_data()
 
-        # Upload cleaned PDF data to the local database
-        pdf_tablename = 'dim_card_details'
-        db_connector.upload_to_db(cleaned_pdf, pdf_tablename, engine=local_engine)
-    else:
-        print("No PDF data extracted. Please check the PDF source.")
+    
+    

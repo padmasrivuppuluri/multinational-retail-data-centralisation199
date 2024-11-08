@@ -15,13 +15,14 @@ class DataExtractor:
     def read_rds_table(self,tablename):
         df = pd.read_sql_table(tablename, con = self.engine)
         return df
+    
     def convert_df_csv(self, df, csv_file="data.csv"):
         df.to_csv(csv_file, index=False)
 
     #To retrieve pdf data
     def retrieve_pdf_data(self,pdf_link):
         df  = tabula.read_pdf(pdf_link, pages='all')
-        return len(df)
+        return df
     
     
     
