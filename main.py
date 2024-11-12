@@ -24,19 +24,18 @@ if __name__ == "__main__":
     data = data_extractor.read_rds_table('legacy_users')  
     data = pd.DataFrame(data) 
     print(type(data)) 
-    
-    #csv file
-    csv_file = data_extractor.convert_df_csv(data, csv_file= "file1.csv")
 
     # Initialize the DataCleaning class and clean the extracted data (for CSV data)
+    '''
     data_cleaning = DataCleaning(data)
     cleaned_csv = data_cleaning.clean_user_data()
     print(cleaned_csv)
+    data_extractor.convert_df_csv(cleaned_csv,csv_file='cleaned_users_data.csv')
 
     # Upload the cleaned data to the local database in the 'dim_users' table
     tablename = 'dim_users'
     db_connector.upload_to_db(cleaned_csv, tablename, engine=local_engine)  
-
+'''
     # Retrieve the PDF data using Tabula 
     pdf_link = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
     pdf_data = data_extractor.retrieve_pdf_data(pdf_link)
@@ -53,6 +52,7 @@ if __name__ == "__main__":
     db_connector.upload_to_db(cleaned_pdf, pdf_tablename, engine=local_engine)
 
     # Define headers and URLs
+    '''
     headers = {'x-api-key': 'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
     number_stores_url = "https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores"
     store_details_base_url = "https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details"
@@ -78,8 +78,10 @@ if __name__ == "__main__":
     #extract product dettails data using aws s3
     data = data_extractor.extract_from_s3(s3_address="s3://data-handling-public/products.csv")
     print(data)
-    print(type(data))
+    csv_file = data_extractor.convert_df_csv(data, csv_file= "products.csv")
 
+    
+    data_cleaning = DataCleaning(data)
     clean_products_data =data_cleaning.clean_products_data()
     print(clean_products_data)
 
@@ -87,12 +89,13 @@ if __name__ == "__main__":
     db_connector.upload_to_db(clean_products_data,products_tablename,engine=local_engine)
 
     #Extracting data from orders table
+    
     data = data_extractor.read_rds_table('orders_table')
     data = pd.DataFrame(data) 
     print(data) 
 
     csv_file = data_extractor.convert_df_csv(data, csv_file= "orders_data.csv")
-    #data_cleaning = DataCleaning(data)
+    data_cleaning = DataCleaning(data)
     clean_orders_data = data_cleaning.clean_orders_data()
     print(clean_orders_data)
     data_cleaning.cleaned_csv('cleaned_orders.csv')
@@ -104,14 +107,14 @@ if __name__ == "__main__":
     data = data_extractor.extract_eventsdata_from_s3(s3_address="https://data-handling-public.s3.eu-west-1.amazonaws.com/date_details.json")
     print(data)
     print(type(data))
-
+    data_cleaning=DataCleaning(data)
     cleaned_events_data = data_cleaning.clean_date_events_data()
     print(cleaned_events_data)
 
     date_events_tablesname = 'dim_date_times'
     db_connector.upload_to_db(cleaned_events_data,date_events_tablesname,engine=local_engine)
 
-   
+   '''
 
     
 

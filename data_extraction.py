@@ -24,7 +24,6 @@ class DataExtractor:
         df.to_csv(csv_file, index=False)
         return csv_file
     
-
     #To retrieve pdf data
     def retrieve_pdf_data(self,pdf_link):
         df  = tabula.read_pdf(pdf_link, pages='all')

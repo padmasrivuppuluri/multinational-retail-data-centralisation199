@@ -16,10 +16,13 @@ class DataCleaning:
             raise ValueError("No data provided for cleaning CSV data.")
         
         # Step 1: Replace "NULL" strings with NaN
-        print(f"The number of rows before removing null values: {self.df.shape[0]}")
-        self.df.replace('NULL', np.nan, inplace=True)
-        print(f"The number of rows after conerting Nan values: {self.df.shape[0]}")
+        self.df.replace('NULL', pd.NA, inplace=True)
+        self.df.dropna(inplace= True)
+        print(f"The number of rows after removing Nan values: {self.df.shape[0]}")
 
+        if 'date_of_birth' in self.df.columns:
+            self.df['date_of_birth'] = pd.to_datetime(self.df['date_of_birth'],format= 'mixed',errors='coerce')
+        self.df.dropna(subset = 'date_of_birth',inplace= True)
 
         if 'join_date' in self.df.columns:
             self.df['join_date'] = pd.to_datetime(self.df['join_date'], errors='coerce')
@@ -31,30 +34,22 @@ class DataCleaning:
     
     #Cleaning data in pdf file
     def clean_card_data(self):
-        self.df.replace('NULL', np.nan, inplace= True)
+        print(f"The rows before removing NULL values: {self.df.shape[0]}")
+        self.df.replace('NULL', pd.NA, inplace= True)
         self.df.dropna(inplace= True)
         print(f"The number of rows after removing null values: {self.df.shape[0]}")
-
         if 'card_number' in self.df.columns:
-            self.df.drop_duplicates(subset='card_number', inplace=True)
+            self.df.drop_duplicates(subset='card_number',inplace=True)
             print(f"The rows after removing duplicate card numbers: {self.df.shape[0]}")
-            
-
-            self.df['card_number'] = self.df['card_number'].apply(
-                lambda x: re.sub(r'[^0-9?]', '', str(x))  
-            )
-            
-            # Convert 'card_number' to numeric values, coercing errors to NaN
-            self.df['card_number'] = pd.to_numeric(self.df['card_number'], errors='coerce')
+            self.df['card_number'] = self.df['card_number'].astype(str)
+            self.df = self.df[self.df['card_number'].str.isdigit()]
+            self.df['card_number'] = pd.to_numeric(self.df['card_number'])
             print(f"The rows after converting 'card_number' to numeric values,: {self.df.shape[0]}")
-            
             # Step 5: Remove rows where 'card_number' is NaN after coercion
             self.df.dropna(subset=['card_number'], inplace=True)
             print(f"The rows after removing 'card_number' to NaN values,:{self.df.shape[0]}")
-
         if 'date_payment_confirmed' in self.df.columns:
             self.df['date_payment_confirmed'] = pd.to_datetime(self.df['date_payment_confirmed'], errors='coerce')
-
         return self.df
     
     def called_clean_store_data(self):
