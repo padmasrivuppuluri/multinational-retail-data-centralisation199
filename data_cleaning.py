@@ -40,29 +40,36 @@ class DataCleaning:
         print(f"The number of rows after removing null values: {self.df.shape[0]}")
         if 'card_number' in self.df.columns:
             self.df.drop_duplicates(subset='card_number',inplace=True)
-            print(f"The rows after removing duplicate card numbers: {self.df.shape[0]}")
             self.df['card_number'] = self.df['card_number'].astype(str)
+
+        # Remove entries with any non-numeric characters
+            self.df['card_number'] = self.df['card_number'].apply(lambda x: re.sub(r'[^\d]', '', x))
+
+            # Filter out empty strings or invalid card numbers that became empty after removal of characters
             self.df = self.df[self.df['card_number'].str.isdigit()]
-            self.df['card_number'] = pd.to_numeric(self.df['card_number'])
+
+            # Convert valid entries to numeric type
+            self.df.loc[:, 'card_number'] = pd.to_numeric(self.df['card_number'])
             print(f"The rows after converting 'card_number' to numeric values,: {self.df.shape[0]}")
-            # Step 5: Remove rows where 'card_number' is NaN after coercion
-            self.df.dropna(subset=['card_number'], inplace=True)
-            print(f"The rows after removing 'card_number' to NaN values,:{self.df.shape[0]}")
+            self.df = self.df.dropna(subset=['card_number'])
+            print(f"The rows after removing invalid 'card_numbers': {self.df.shape[0]}")
+        if 'expiry_date' in self.df.columns:
+            self.df['expiry_date'] = pd.to_datetime(self.df['expiry_date'],format='%m/%y', errors='coerce')
+        self.df.dropna(subset = 'expiry_date',inplace= True)
+                    
         if 'date_payment_confirmed' in self.df.columns:
-            self.df['date_payment_confirmed'] = pd.to_datetime(self.df['date_payment_confirmed'], errors='coerce')
+            self.df.loc[:, 'date_payment_confirmed'] = pd.to_datetime(self.df['date_payment_confirmed'], errors='coerce')
         return self.df
     
     def called_clean_store_data(self):
-        # Replace multiple variations of 'NULL' with NaN in all columns
-        self.df.replace('NULL', np.nan, inplace=True)
-       # self.df.dropna(inplace = True)
+        self.df.replace('NULL', pd.NA, inplace=True)
+        #self.df.dropna(inplace = True)
         print(f"No. of rows {self.df.shape}")
-
-        #Convert "opening_date" column into a datetime data type
-        self.df['opening_date'] = pd.to_datetime(self.df['opening_date'], errors='coerce', dayfirst=True)
-
-        # Drop rows with NaT (invalid dates) in 'opening_date'
-        self.df.dropna(subset=['opening_date'], inplace=True)
+        
+       #Convert "opening_date" column into a datetime data type
+        if 'opening_date' in self.df.columns:
+            self.df['opening_date'] = pd.to_datetime(self.df['opening_date'],format= 'mixed',errors='coerce')
+        self.df.dropna(subset = ['opening_date'],inplace= True)
 
         self.df['staff_numbers'] = self.df['staff_numbers'].str.replace(r'[^0-9]', '', regex=True)
         return self.df
@@ -71,39 +78,37 @@ class DataCleaning:
         self.df.to_csv(clean_file, index=False)
 
     def convert_weight(self, value):
-        if pd.isna(value):
-            return None
-        value = str(value).lower().strip()
-        value = re.sub(r'[^0-9\.a-z]', '', value)
-
-        if 'kg' in value:
-                return float(value.replace('kg', '').strip())
-        elif 'g' in value:
-            try:
-                return float(value.replace('g', '').strip()) / 1000
-            except ValueError:
-                return None
-        elif 'ml' in value:
-            try:
+        try:
+            value = value.lower().replace(' ', '')  # Ensure consistent formatting
+            if 'kg' in value:
+                return float(value.replace('kg', '').strip())  # Convert to float and assume kg
+            elif 'g' in value:
+                # Handle cases like '16x10g' or '8x150g'
+                match = re.match(r'(\d+)[xX](\d+)g', value)
+                if match:
+                    quantity, grams = match.groups()
+                    return int(quantity) * int(grams) / 1000  # Convert total grams to kg
+                else:
+                    return float(value.replace('g', '').strip()) / 1000  # Convert grams to kg
+            elif 'ml' in value:
+                # Assume density of 1g/ml (i.e., 1 ml = 1 g), convert to kg
                 return float(value.replace('ml', '').strip()) / 1000
-            except ValueError:
-                return None
-        else:
-            try:
-                return float(value)
-            except ValueError:
-                return None
+            else:
+                return None  # Ignore other units like ml or invalid values
+        except (ValueError, AttributeError):
+            return None  # Handle non-convertible values
 
     def convert_product_weights(self):
         if 'weight' in self.df.columns:
             self.df['weight'] = self.df['weight'].apply(self.convert_weight)
             self.df.dropna(subset=['weight'], inplace=True)
+            self.df['weight'] = self.df['weight'].apply(lambda x: f"{x:.5f}kg")
         else:
             print("Warning: 'weight' column not found in the DataFrame.")
-        return self.df
+        return self.df  
     
     def clean_products_data(self):
-        self.df.replace('NULL', np.nan, inplace=True)
+        self.df.replace('NULL', pd.NA, inplace=True)
         self.df.dropna(inplace=True)
         self.convert_product_weights()
         return self.df
@@ -113,7 +118,7 @@ class DataCleaning:
         self.df.drop(columns=[col for col in columns_to_remove if col in self.df.columns], inplace=True)
         return self.df
     def clean_date_events_data(self):
-        self.df.replace('NULL', np.nan, inplace=True)
+        self.df.replace('NULL', pd.NA, inplace=True)
         self.df.dropna(inplace=True)
 
         for column in ['day', 'month','year']:

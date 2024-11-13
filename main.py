@@ -23,7 +23,7 @@ if __name__ == "__main__":
     # Extract data from a specific table ('legacy_users')
     data = data_extractor.read_rds_table('legacy_users')  
     data = pd.DataFrame(data) 
-    print(type(data)) 
+    #print(type(data)) 
 
     # Initialize the DataCleaning class and clean the extracted data (for CSV data)
     '''
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # Upload the cleaned data to the local database in the 'dim_users' table
     tablename = 'dim_users'
     db_connector.upload_to_db(cleaned_csv, tablename, engine=local_engine)  
-'''
+
     # Retrieve the PDF data using Tabula 
     pdf_link = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
     pdf_data = data_extractor.retrieve_pdf_data(pdf_link)
@@ -45,14 +45,12 @@ if __name__ == "__main__":
     pdf_cleaning = DataCleaning(data=pdf_data)  
     cleaned_pdf = pdf_cleaning.clean_card_data()
     print(cleaned_pdf)
-
     
     # Upload cleaned PDF data to the local database
     pdf_tablename = 'dim_card_details'
     db_connector.upload_to_db(cleaned_pdf, pdf_tablename, engine=local_engine)
-
+'''
     # Define headers and URLs
-    '''
     headers = {'x-api-key': 'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
     number_stores_url = "https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores"
     store_details_base_url = "https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details"
@@ -65,7 +63,6 @@ if __name__ == "__main__":
     stores_df = data_extractor.get_store_data(store_details_base_url, num_stores)
     print(stores_df)
 
-
    #Clean store data
     store_data_cleaning = DataCleaning(data=stores_df)
     cleaned_store_data =store_data_cleaning.called_clean_store_data()
@@ -74,7 +71,7 @@ if __name__ == "__main__":
 
     store_tablename = 'dim_store_details'
     db_connector.upload_to_db(cleaned_store_data,store_tablename,engine=local_engine)
-
+'''
     #extract product dettails data using aws s3
     data = data_extractor.extract_from_s3(s3_address="s3://data-handling-public/products.csv")
     print(data)
@@ -84,10 +81,12 @@ if __name__ == "__main__":
     data_cleaning = DataCleaning(data)
     clean_products_data =data_cleaning.clean_products_data()
     print(clean_products_data)
+    data_extractor.convert_df_csv(clean_products_data,csv_file='cleaned_products.csv')
 
     products_tablename = 'dim_products'
     db_connector.upload_to_db(clean_products_data,products_tablename,engine=local_engine)
 
+      
     #Extracting data from orders table
     
     data = data_extractor.read_rds_table('orders_table')
@@ -114,7 +113,7 @@ if __name__ == "__main__":
     date_events_tablesname = 'dim_date_times'
     db_connector.upload_to_db(cleaned_events_data,date_events_tablesname,engine=local_engine)
 
-   '''
+'''
 
     
 
