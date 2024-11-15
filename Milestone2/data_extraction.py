@@ -41,22 +41,19 @@ class DataExtractor:
           print(f"Request failed with status code: {response.status_code}")
           print(f"Response Text: {response.text}")
           return None
-
     def get_store_data(self, base_url, number_of_stores):
         """Retrieve store data for all stores and return it as a DataFrame."""
         store_data = []
-        for store_number in range(1, number_of_stores + 1):
+        for store_number in range(0, number_of_stores + 1):
             url = f"{base_url}/{store_number}"
             response = requests.get(url, headers=self.headers)
             if response.status_code == 200:
                 store_data.append(response.json())
-
             elif response.status_code == 500:
                 print(f"Error fetching data for store {store_number}: 500 (server error). Skipping this store.")
             # Handle any other errors (e.g., 404, 400) by logging them
             else:
-                print(f"Error fetching data for store {store_number}: {response.status_code}")
-        
+                print(f"Error fetching data for store {store_number}: {response.status_code}")        
         # Return the store data as a DataFrame
         return pd.DataFrame(store_data)
     

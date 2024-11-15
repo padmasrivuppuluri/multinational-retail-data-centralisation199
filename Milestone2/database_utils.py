@@ -1,16 +1,12 @@
 import yaml
 from sqlalchemy import create_engine
 import pandas as pd
-from data_extraction import DataExtractor
-from data_cleaning import DataCleaning
 
 class DatabaseConnector:
     def __init__(self,creds_file = 'db_creds.yaml', local_file = 'local_creds.yaml'):
         self.creds_file = creds_file
         self.local_file = local_file
         self.engine = None
-       
-
     #Reading credentials from db_creds.yaml file
     def read_db_creds(self):
         with open(self.creds_file, 'r') as f:

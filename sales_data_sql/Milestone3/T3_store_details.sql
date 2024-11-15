@@ -12,6 +12,15 @@ ALTER TABLE dim_store_details
 DROP COLUMN lat;
 
 "Updating datatypes in dim_store_details_table"
+UPDATE dim_store_details
+SET longitude = NULL
+WHERE longitude = 'N/A';
+
+UPDATE dim_store_details
+SET latitude = NULL
+WHERE latitude = 'N/A';
+
+
 ALTER TABLE dim_store_details
     ALTER COLUMN longitude TYPE NUMERIC USING longitude::NUMERIC,
     ALTER COLUMN locality TYPE VARCHAR(255),
@@ -23,4 +32,9 @@ ALTER TABLE dim_store_details
     ALTER COLUMN country_code TYPE VARCHAR(10),
     ALTER COLUMN continent TYPE VARCHAR(255);
 
-SELECT locality FROM dim_store_details WHERE locality = 'N/A' "no data"
+SELECT locality FROM dim_store_details WHERE locality = 'N/A' 
+
+"There is a row that represents the business's website change the location column values from N/A to NULL."
+UPDATE dim_store_details
+SET locality = NULL
+WHERE locality = 'N/A';

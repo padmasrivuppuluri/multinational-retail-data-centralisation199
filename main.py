@@ -1,6 +1,6 @@
-from database_utils import DatabaseConnector
-from data_extraction import DataExtractor
-from data_cleaning import DataCleaning
+from Milestone2.database_utils import DatabaseConnector
+from Milestone2.data_extraction import DataExtractor
+from Milestone2.data_cleaning import DataCleaning
 import pandas as pd
 
 if __name__ == "__main__":
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     #print(type(data)) 
 
     # Initialize the DataCleaning class and clean the extracted data (for CSV data)
-    '''
+    
     data_cleaning = DataCleaning(data)
     cleaned_csv = data_cleaning.clean_user_data()
     print(cleaned_csv)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     # Upload cleaned PDF data to the local database
     pdf_tablename = 'dim_card_details'
     db_connector.upload_to_db(cleaned_pdf, pdf_tablename, engine=local_engine)
-'''
+
     # Define headers and URLs
     headers = {'x-api-key': 'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
     number_stores_url = "https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores"
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     print(num_stores)
 
     stores_df = data_extractor.get_store_data(store_details_base_url, num_stores)
-    print(stores_df)
+    #print(stores_df)
 
    #Clean store data
     store_data_cleaning = DataCleaning(data=stores_df)
@@ -71,8 +71,8 @@ if __name__ == "__main__":
 
     store_tablename = 'dim_store_details'
     db_connector.upload_to_db(cleaned_store_data,store_tablename,engine=local_engine)
-'''
-    #extract product dettails data using aws s3
+
+    #extract product details data using aws s3
     data = data_extractor.extract_from_s3(s3_address="s3://data-handling-public/products.csv")
     print(data)
     csv_file = data_extractor.convert_df_csv(data, csv_file= "products.csv")
@@ -85,10 +85,8 @@ if __name__ == "__main__":
 
     products_tablename = 'dim_products'
     db_connector.upload_to_db(clean_products_data,products_tablename,engine=local_engine)
-
-      
+   
     #Extracting data from orders table
-    
     data = data_extractor.read_rds_table('orders_table')
     data = pd.DataFrame(data) 
     print(data) 
@@ -112,18 +110,3 @@ if __name__ == "__main__":
 
     date_events_tablesname = 'dim_date_times'
     db_connector.upload_to_db(cleaned_events_data,date_events_tablesname,engine=local_engine)
-
-'''
-
-    
-
-
-
-
-    
-
-
-
-
-    
-     
