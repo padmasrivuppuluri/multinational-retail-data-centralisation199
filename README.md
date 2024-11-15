@@ -28,7 +28,7 @@ An Entity Relationship Diagram (ERD) will be created to represent the structure 
 - orders_data from RDS
 - date_events from S3
 ERD image:
-![img](erd.jpg)
+![img](ERD_images/system_erd.jpg)
 
 ## Dependencies:
 - Python 3,
@@ -60,7 +60,7 @@ This milestone consists of 3 Python files:
     - Cast the columns to their correct data types
     - Create primary and foreign keys to maintain data integrity.
 ERD image:
-![img](sales_data_erd.png)
+![img](ERD_images/sales_data_erd.png)
 
 ### Milestone 4: Querying the data
 Observe and analyze metrics by querying the centralized database.
