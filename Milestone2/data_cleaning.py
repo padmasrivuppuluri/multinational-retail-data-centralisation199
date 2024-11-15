@@ -31,8 +31,7 @@ class DataCleaning:
     def cleaned_csv(self,clean_file = 'cleaned_file.csv'):
         self.df.to_csv(clean_file, index=False)
         
-    
-    #Cleaning data in pdf file
+    #Cleaning card_details data in pdf file
     def clean_card_data(self):
         print(f"The rows before removing NULL values: {self.df.shape[0]}")
         self.df.replace('NULL', pd.NA, inplace= True)
@@ -61,6 +60,7 @@ class DataCleaning:
             self.df.loc[:, 'date_payment_confirmed'] = pd.to_datetime(self.df['date_payment_confirmed'], errors='coerce')
         return self.df
     
+    #Cleaning store_details_data
     def called_clean_store_data(self):
         self.df.replace('NULL', pd.NA, inplace=True)
         #self.df.dropna(inplace = True)
@@ -105,18 +105,22 @@ class DataCleaning:
             self.df['weight'] = self.df['weight'].apply(lambda x: f"{x:.5f}kg")
         else:
             print("Warning: 'weight' column not found in the DataFrame.")
-        return self.df  
-    
+        return self.df 
+     
+    # Cleaning products data
     def clean_products_data(self):
         self.df.replace('NULL', pd.NA, inplace=True)
         self.df.dropna(inplace=True)
         self.convert_product_weights()
         return self.df
     
+    #Cleaning orders data
     def clean_orders_data(self):
         columns_to_remove = ['first_name','last_name','1']
         self.df.drop(columns=[col for col in columns_to_remove if col in self.df.columns], inplace=True)
         return self.df
+    
+    #Cleaning date_events_data
     def clean_date_events_data(self):
         self.df.replace('NULL', pd.NA, inplace=True)
         self.df.dropna(inplace=True)

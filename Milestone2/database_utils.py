@@ -31,7 +31,6 @@ class DatabaseConnector:
         data = self.local_db_creds()
         self.engine = create_engine(f"{data['DATABASE_TYPE']}+{data['DBAPI']}://{data['USER']}:{data['PASSWORD']}@{data['HOST']}:{data['PORT']}/{data['DATABASE']}")
         return self.engine
-
     
     def upload_to_db(self, df, tablename, engine=None):
         # Use the passed engine or the instance's engine
@@ -46,19 +45,7 @@ class DatabaseConnector:
         df.to_sql(tablename, con=engine, if_exists='replace', index=False)
         print(f"Data successfully '{tablename}' uploaded to the database")
 
-    def upload_pdf_to_db(self, df, tablename, engine=None):
-        # Use the passed engine or the instance's engine
-        if engine is None:
-            engine = self.engine
-            print(engine)
-
-        if engine is None:
-            raise ValueError("Engine is not initialized. Please check engine connection")
-
-        # Upload the DataFrame to the specified table
-        df.to_sql(tablename, con=engine, if_exists='replace', index=False)
-        print(f"Data successfully '{tablename}' uploaded to the database")
-
+    
         
 
 

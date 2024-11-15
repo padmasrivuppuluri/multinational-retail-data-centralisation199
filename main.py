@@ -26,17 +26,16 @@ if __name__ == "__main__":
     #print(type(data)) 
 
     # Initialize the DataCleaning class and clean the extracted data (for CSV data)
-    
     data_cleaning = DataCleaning(data)
-    cleaned_csv = data_cleaning.clean_user_data()
-    print(cleaned_csv)
-    data_extractor.convert_df_csv(cleaned_csv,csv_file='cleaned_users_data.csv')
+    cleaned_users_data = data_cleaning.clean_user_data()
+    print(cleaned_users_data)
+    data_extractor.convert_df_csv(cleaned_users_data,csv_file='cleaned_users_data.csv')
 
     # Upload the cleaned data to the local database in the 'dim_users' table
     tablename = 'dim_users'
-    db_connector.upload_to_db(cleaned_csv, tablename, engine=local_engine)  
+    db_connector.upload_to_db(cleaned_users_data, tablename, engine=local_engine)  
 
-    # Retrieve the PDF data using Tabula 
+    # Retrieve the PDF card_details data using Tabula 
     pdf_link = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
     pdf_data = data_extractor.retrieve_pdf_data(pdf_link)
     print(type(pdf_data))
@@ -50,7 +49,7 @@ if __name__ == "__main__":
     pdf_tablename = 'dim_card_details'
     db_connector.upload_to_db(cleaned_pdf, pdf_tablename, engine=local_engine)
 
-    # Define headers and URLs
+    # Define headers and URLs to extract store_details_data
     headers = {'x-api-key': 'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
     number_stores_url = "https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores"
     store_details_base_url = "https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details"
@@ -101,6 +100,7 @@ if __name__ == "__main__":
     orders_table_name = 'orders_table'
     db_connector.upload_to_db(clean_orders_data,orders_table_name,engine=local_engine)
 
+    #Extracts date_events data from RDS
     data = data_extractor.extract_eventsdata_from_s3(s3_address="https://data-handling-public.s3.eu-west-1.amazonaws.com/date_details.json")
     print(data)
     print(type(data))

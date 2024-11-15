@@ -73,6 +73,7 @@ class DataExtractor:
         s3.download_file(bucket_name, key, local_filename)
         df = pd.read_csv(local_filename)
         return df
+    
     #extracting  date events data drom AWS s3
     def extract_eventsdata_from_s3(self,s3_address):
         bucket_name = "data-handling-public"
